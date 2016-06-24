@@ -120,7 +120,7 @@ glance_download_{{ image.name }}:
 
 glance_install_{{ image.name }}:
   cmd.wait:
-  - name: source /root/keystonerc; glance image-create --name '{{ image.name }}' --is-public {{ image.public }} --container-format bare --disk-format {{ image.format }} < {{ image.file }}
+  - name: . /root/keystonerc; glance image-create --name '{{ image.name }}' --visibility {{ image.visibility }} --container-format bare --disk-format {{ image.format }} --file {{ image.file }}
   - cwd: /srv/glance
   - require:
     - service: glance_services
@@ -141,12 +141,12 @@ glance_download_{{ image_name }}:
 
 glance_install_image_{{ image_name }}:
   cmd.run:
-  - name: source /root/keystonerc; glance image-create --name '{{ image_name }}' --is-public {{ image.public }} --container-format bare --disk-format {{ image.format }} < /srv/glance/{{ image.file }}
+  - name: . /root/keystonerc; glance image-create --name '{{ image_name }}' --is-public {{ image.public }} --container-format bare --disk-format {{ image.format }} < /srv/glance/{{ image.file }}
   - require:
     - service: glance_services
     - cmd: glance_download_{{ image_name }}
   - unless:
-    - cmd: source /root/keystonerc && glance image-list | grep {{ image_name }}
+    - cmd: . /root/keystonerc && glance image-list | grep {{ image_name }}
 
 {%- endfor %}
 
