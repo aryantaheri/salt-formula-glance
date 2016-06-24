@@ -100,6 +100,14 @@ glance_entrypoint:
   - require:
     - pkg: glance_packages
 
+/srv/glance:
+  file.directory:
+  - mode: 755
+  - user: glance
+  - group: glance
+  - require:
+    - pkg: glance_packages
+
 {%- for image in server.get('images', []) %}
 
 glance_download_{{ image.name }}:
