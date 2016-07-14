@@ -126,6 +126,12 @@ glance_install_{{ image.name }}:
     - service: glance_services
   - watch:
     - cmd: glance_download_{{ image.name }}
+  - unless:
+    - cmd: . /root/keystonerc && glance image-list | grep '{{ image.name }}'
+
+glance_remove_temp_{{ image.name }}:
+  file.absent:
+    - name: /srv/glance/{{ image.file }}
 
 {%- endfor %}
 
@@ -146,7 +152,7 @@ glance_install_image_{{ image_name }}:
     - service: glance_services
     - cmd: glance_download_{{ image_name }}
   - unless:
-    - cmd: . /root/keystonerc && glance image-list | grep {{ image_name }}
+    - cmd: . /root/keystonerc && glance image-list | grep '{{ image_name }}'
 
 {%- endfor %}
 
