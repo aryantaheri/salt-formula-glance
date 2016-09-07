@@ -113,21 +113,20 @@ glance_entrypoint:
 glance_download_{{ image.name }}:
   cmd.run:
   - name: wget {{ image.source }}
-  - unless: "test -e {{ image.file }}"
+  - creates: {{ image.file }}
+  - unless: . /root/keystonerc && glance image-list | grep '{{ image.name }}'
   - cwd: /srv/glance
   - require:
     - file: /srv/glance
 
 glance_install_{{ image.name }}:
-  cmd.wait:
+  cmd.run:
   - name: . /root/keystonerc; glance image-create --name '{{ image.name }}' --visibility {{ image.visibility }} --container-format bare --disk-format {{ image.format }} --file {{ image.file }}
   - cwd: /srv/glance
   - require:
     - service: glance_services
-  - watch:
+  - onchanges:
     - cmd: glance_download_{{ image.name }}
-  - unless:
-    - cmd: . /root/keystonerc && glance image-list | grep '{{ image.name }}'
 
 glance_remove_temp_{{ image.name }}:
   file.absent:
